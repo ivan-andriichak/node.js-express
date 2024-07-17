@@ -1,0 +1,18 @@
+{
+  "name": "node.js-express",
+  "version": "1.1.2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node.js",
+    "express"
+  ],
+  "author": "Ivan Andriichak",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
