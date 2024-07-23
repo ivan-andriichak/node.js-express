@@ -39,8 +39,7 @@ class UserService {
     return await userRepository.create(dto);
   }
 
-  // Метод для отримання користувача за ID
-  public async getById(userId: number): Promise<IUser> {
+  public async getById(userId: string): Promise<IUser> {
     // Викликаємо метод getById з userRepository для отримання користувача за ID
     return await userRepository.getById(userId);
   }
