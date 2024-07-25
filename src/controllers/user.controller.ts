@@ -4,23 +4,19 @@ import { IUser } from "../interfaces/user.inerface";
 import { userService } from "../services/user.service";
 
 class UserController {
-  // Метод для отримання списку користувачів
   public async getList(req: Request, res: Response, next: NextFunction) {
     try {
-      // Викликаємо метод getList з сервісу користувачів
       const result = await userService.getList();
-      // Відправляємо результат клієнту
       res.json(result);
     } catch (e) {
       next(e);
     }
   }
 
-  // Метод для створення нового користувача
   public async create(req: Request, res: Response, next: NextFunction) {
     try {
       // Отримуємо дані нового користувача з запиту
-      const dto = req.body as any;
+      const dto = req.body as IUser;
       // Викликаємо метод create з сервісу користувачів
       const result = await userService.create(dto);
       // Відправляємо результат клієнту з кодом статусу 201 (створено)
@@ -43,7 +39,7 @@ class UserController {
 
   public async updateById(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = Number(req.params.userId);
+      const userId = req.params.userId;
       const dto = req.body as IUser;
       const result = await userService.updateById(userId, dto);
       res.json(result);
@@ -54,11 +50,10 @@ class UserController {
 
   public async deleteById(req: Request, res: Response, next: NextFunction) {
     try {
-      const userId = Number(req.params.userId);
+      const userId = req.params.userId;
       await userService.deleteById(userId);
       res.sendStatus(204);
     } catch (e) {
-      // Передаємо помилку в обробник помилок
       next(e);
     }
   }

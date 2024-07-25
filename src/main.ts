@@ -1,9 +1,7 @@
-// Імпортуємо необхідні модулі з бібліотеки express
 import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 
 import { configs } from "./configs/configs";
-// Імпортуємо клас ApiError для обробки помилок
 import { ApiError } from "./errors/api-errors";
 import { userRouter } from "./routers/user.router";
 
@@ -23,20 +21,16 @@ app.use("/users", userRouter);
 app.use(
   "*",
   (err: ApiError, req: Request, res: Response, next: NextFunction) => {
-    // Відправляємо відповідь з кодом статусу помилки та повідомленням про помилку
     res.status(err.status || 500).json(err.message);
   },
 );
 
 // Обробка неперехоплених винятків
 process.on("uncaughtException", (e) => {
-  // Логування помилки
   console.error("uncaughtException", e.message, e.stack);
-  // Завершення процесу з кодом 1 (помилка)
   process.exit(1);
 });
 
-// Запуск сервера на порту 3000
 app.listen(configs.APP_PORT, configs.APP_HOST, async () => {
   await mongoose.connect(configs.MONGO_URL, {});
   console.log(`Server is running on port ${configs.APP_PORT}`);
