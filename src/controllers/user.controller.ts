@@ -13,20 +13,6 @@ class UserController {
     }
   }
 
-  public async create(req: Request, res: Response, next: NextFunction) {
-    try {
-      // Отримуємо дані нового користувача з запиту
-      const dto = req.body as IUser;
-      // Викликаємо метод create з сервісу користувачів
-      const result = await userService.create(dto);
-      // Відправляємо результат клієнту з кодом статусу 201 (створено)
-      res.status(201).json(result);
-    } catch (e) {
-      // Передаємо помилку в обробник помилок
-      next(e);
-    }
-  }
-
   public async getById(req: Request, res: Response, next: NextFunction) {
     try {
       const userId = req.params.userId;

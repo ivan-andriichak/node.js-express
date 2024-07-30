@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 
 import { configs } from "./configs/configs";
 import { ApiError } from "./errors/api-errors";
+import { authRouter } from "./routers/auth.router";
 import { userRouter } from "./routers/user.router";
 
 // Створюємо додаток express
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Встановлюємо роутер для обробки запитів на '/users'
+app.use("/auth", authRouter);
 app.use("/users", userRouter);
 
 // Обробник помилок для всіх маршрутів
