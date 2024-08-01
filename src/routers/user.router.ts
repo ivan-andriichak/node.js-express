@@ -5,26 +5,31 @@ import { authMiddleware } from "../middlewares/auth.middleware";
 import { commonMiddleware } from "../middlewares/common.middleware";
 import { UserValidator } from "../validator/user.validator";
 
+// Створюємо новий екземпляр роутера
 const router = Router();
 
+// Визначення маршруту для отримання списку користувачів
 router.get("/", userController.getList);
 
+// Визначення маршруту для отримання інформації про поточного користувача
+router.get("/:me", authMiddleware.checkAccessToken, userController.getMe);
+
+// Визначення маршруту для оновлення інформації про поточного користувача
+router.put(
+  "/:me",
+  authMiddleware.checkAccessToken, // Перевірка наявності і дійсності токена доступу
+  commonMiddleware.isBodyValid(UserValidator.updateUser), // Валідація тіла запиту на відповідність схемі updateUser
+  userController.updateMe, // Виклик контролера для оновлення інформації
+);
+
+// Визначення маршруту для видалення поточного користувача
+router.delete("/:me", authMiddleware.checkAccessToken, userController.deleteMe);
+
+// Визначення маршруту для отримання інформації про користувача за ID
 router.get(
   "/:userId",
-  authMiddleware.checkAccessToken,
-  commonMiddleware.isIdValid("userId"),
-  userController.getById,
-);
-router.put(
-  "/:userId",
-  commonMiddleware.isIdValid("userId"),
-  commonMiddleware.isBodyValid(UserValidator.updateUser),
-  userController.updateById,
-);
-router.delete(
-  "/:carId",
-  commonMiddleware.isIdValid("carId"),
-  userController.deleteById,
+  commonMiddleware.isIdValid("userId"), // Перевірка валідності ID користувача
+  userController.getById, // Виклик контролера для отримання інформації про користувача
 );
 
 export const userRouter = router;

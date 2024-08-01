@@ -5,7 +5,11 @@ import { regexConstant } from "../constants/regex.constant";
 export class UserValidator {
   private static name = joi.string().min(3).trim();
   private static age = joi.number().min(15).max(50);
-  private static email = joi.string().lowercase().regex(regexConstant.EMAIL);
+  private static email = joi
+    .string()
+    .lowercase()
+    .regex(regexConstant.EMAIL)
+    .trim();
   private static password = joi.string().regex(regexConstant.PASSWORD).trim();
   private static phone = joi.string().regex(regexConstant.PHONE);
 
@@ -22,5 +26,10 @@ export class UserValidator {
     age: UserValidator.age,
     email: UserValidator.email,
     phone: UserValidator.phone,
+  });
+
+  public static login = joi.object({
+    email: UserValidator.email.required(),
+    password: UserValidator.password.required(),
   });
 }
