@@ -41,6 +41,7 @@ class AuthMiddleware {
         throw new ApiError("Token is not valid", 401);
       }
 
+      req.res.locals.tokenId = pair._id;
       // Зберігання декодованого корисного навантаження токена у локальних змінних відповіді
       req.res.locals.jwtPayload = payload;
       // Передача управління наступному middleware

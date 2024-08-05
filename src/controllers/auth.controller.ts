@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 
 import { ITokenPayload } from "../interfaces/token.inerface";
-import { IUser } from "../interfaces/user.inerface";
+import { ILogin, IUser } from "../interfaces/user.inerface";
 import { authService } from "../services/auth.service";
 
 class AuthController {
@@ -25,7 +25,7 @@ class AuthController {
   public async signIn(req: Request, res: Response, next: NextFunction) {
     try {
       // Отримання даних з тіла запиту
-      const dto = req.body as any;
+      const dto = req.body as ILogin;
 
       const result = await authService.signIn(dto);
       res.status(201).json(result);
@@ -48,6 +48,35 @@ class AuthController {
       res.status(201).json(result);
     } catch (e) {
       // Обробка помилки і передача її до глобального обробника помилок
+      next(e);
+    }
+  }
+
+  // Метод для виходу з системи (лог-аут)
+  public async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Отримання id токена з локальних змінних відповіді
+      const tokenId = req.res.locals.tokenId as string;
+      // Отримання jwtPayload з локальних змінних відповіді
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+
+      // Виклик методу logout з authService для видалення токена
+      await authService.logout(jwtPayload, tokenId);
+      // Відправлення відповіді з кодом 204 (немає вмісту)
+      res.sendStatus(204);
+    } catch (e) {
+      // Обробка помилки і передача її до глобального обробника помилок
+      next(e);
+    }
+  }
+
+  public async logoutAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
+
+      await authService.logoutAll(jwtPayload);
+      res.sendStatus(204).json(jwtPayload);
+    } catch (e) {
       next(e);
     }
   }
