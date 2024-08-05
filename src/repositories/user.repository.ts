@@ -10,9 +10,9 @@ class UserRepository {
   }
 
   // Метод для отримання списку всіх користувачів
-  public async getList(): Promise<IUser[]> {
+  public async getList(query: any): Promise<IUser[]> {
     // Використовує метод find з моделі User для отримання всіх користувачів
-    return await User.find();
+    return await User.find().limit(query.limit).skip(query.skip);
   }
 
   // Метод для створення нового користувача

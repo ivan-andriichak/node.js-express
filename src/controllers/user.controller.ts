@@ -6,8 +6,9 @@ import { userService } from "../services/user.service";
 class UserController {
   public async getList(req: Request, res: Response, next: NextFunction) {
     try {
+      const query = req.query;
       // Виклик сервісу для отримання списку користувачів
-      const result = await userService.getList();
+      const result = await userService.getList(query);
       // Відправлення результату у форматі JSON
       res.json(result);
     } catch (e) {
