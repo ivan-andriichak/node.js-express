@@ -29,7 +29,7 @@ class UserRepository {
   }
 
   // Метод для оновлення користувача за ID
-  public async updateById(userId: string, dto: IUser): Promise<IUser> {
+  public async updateById(userId: string, dto: Partial<IUser>): Promise<IUser> {
     // Використовує метод findByIdAndUpdate з моделі User для оновлення користувача
     // Параметр returnDocument: "after" забезпечує повернення оновленого документа
     return await User.findByIdAndUpdate(userId, dto, {

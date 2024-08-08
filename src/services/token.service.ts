@@ -1,59 +1,91 @@
 import * as jsonwebtoken from "jsonwebtoken";
 
 import { configs } from "../configs/configs";
+import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { TokenTypeEnum } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api-errors";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.inerface";
 
 class TokenService {
-  // Метод для генерації пари токенів (доступу і оновлення)
   public async generatePair(payload: ITokenPayload): Promise<ITokenPair> {
-    // Створюємо токен доступу (access token)
     const accessToken = jsonwebtoken.sign(payload, configs.JWT_ACCESS_SECRET, {
-      expiresIn: configs.JWT_ACCESS_EXPIRES_IN, // Визначаємо час життя токена доступу
+      expiresIn: configs.JWT_ACCESS_EXPIRES_IN,
     });
-
-    // Створюємо токен оновлення (refresh token)
     const refreshToken = jsonwebtoken.sign(
       payload,
       configs.JWT_REFRESH_SECRET,
-      {
-        expiresIn: configs.JWT_REFRESH_EXPIRES_IN, // Визначаємо час життя токена оновлення
-      },
+      { expiresIn: configs.JWT_REFRESH_EXPIRES_IN },
     );
-
-    // Повертаємо об'єкт з двома токенами
     return {
       accessToken,
       refreshToken,
     };
   }
 
-  // Метод для перевірки токена (доступу або оновлення)
   public checkToken(token: string, type: TokenTypeEnum): ITokenPayload {
     try {
       let secret: string;
-
-      // Вибираємо секретний ключ залежно від типу токена
       switch (type) {
         case TokenTypeEnum.ACCESS:
-          secret = configs.JWT_ACCESS_SECRET; // Секретний ключ для токена доступу
+          secret = configs.JWT_ACCESS_SECRET;
           break;
         case TokenTypeEnum.REFRESH:
-          secret = configs.JWT_REFRESH_SECRET; // Секретний ключ для токена оновлення
+          secret = configs.JWT_REFRESH_SECRET;
           break;
         default:
-          throw new ApiError("Token type is not valid", 401); // Помилка, якщо тип токена не відповідає жодному з варіантів
+          throw new ApiError("Token type is not valid", 401);
       }
-
-      // Перевіряємо токен за допомогою обраного секретного ключа
       return jsonwebtoken.verify(token, secret) as ITokenPayload;
     } catch (error) {
-      // Якщо токен недійсний або сталася помилка, кидаємо помилку
-      throw new ApiError("Token is not valid", 500);
+      throw new ApiError("Token is not valid", 401);
+    }
+  }
+
+  public async generateActionToken(
+    payload: ITokenPayload,
+    type: ActionTokenTypeEnum,
+  ): Promise<string> {
+    let secret: string;
+    let expiresIn: string;
+
+    switch (type) {
+      case ActionTokenTypeEnum.FORGOT_PASSWORD:
+        secret = configs.JWT_ACTION_FORGOT_PASSWORD_SECRET;
+        expiresIn = configs.JWT_ACTION_FORGOT_PASSWORD_EXPIRES_IN;
+        break;
+      case ActionTokenTypeEnum.VERIFY_EMAIL:
+        secret = configs.JWT_ACTION_VERIFY_EMAIL_SECRET;
+        expiresIn = configs.JWT_ACTION_VERIFY_EMAIL_EXPIRES_IN;
+        break;
+      default:
+        throw new ApiError("Action token type is not valid", 401);
+    }
+
+    return jsonwebtoken.sign(payload, secret, { expiresIn });
+  }
+
+  public checkActionToken(
+    token: string,
+    type: ActionTokenTypeEnum,
+  ): ITokenPayload {
+    try {
+      let secret: string;
+      switch (type) {
+        case ActionTokenTypeEnum.FORGOT_PASSWORD:
+          secret = configs.JWT_ACTION_FORGOT_PASSWORD_SECRET;
+          break;
+        case ActionTokenTypeEnum.VERIFY_EMAIL:
+          secret = configs.JWT_ACTION_VERIFY_EMAIL_SECRET;
+          break;
+        default:
+          throw new ApiError("Token type is not valid", 401);
+      }
+
+      return jsonwebtoken.verify(token, secret) as ITokenPayload;
+    } catch (error) {
+      throw new ApiError("Token is not valid", 401);
     }
   }
 }
 
-// Експортуємо екземпляр TokenService для використання в інших частинах програми
 export const tokenService = new TokenService();

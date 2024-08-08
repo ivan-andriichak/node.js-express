@@ -32,4 +32,12 @@ export class UserValidator {
     email: UserValidator.email.required(),
     password: UserValidator.password.required(),
   });
+
+  public static forgotPassword = joi.object({
+    email: UserValidator.email.required(),
+  });
+
+  public static forgotPasswordSet = joi.object({
+    password: UserValidator.password.required(),
+  });
 }

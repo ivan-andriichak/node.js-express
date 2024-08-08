@@ -1,6 +1,7 @@
 import { Router } from "express";
 
 import { authController } from "../controllers/auth.controller";
+import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { commonMiddleware } from "../middlewares/common.middleware";
 import { UserValidator } from "../validator/user.validator";
@@ -51,6 +52,24 @@ router.post(
   authMiddleware.checkAccessToken,
   // Виклик контролера для обробки лог-ауту з усіх сесій
   authController.logoutAll,
+);
+
+router.post(
+  "/forgot-password",
+  commonMiddleware.isBodyValid(UserValidator.forgotPassword),
+  authController.forgotPassword,
+);
+router.put(
+  "/forgot-password",
+  commonMiddleware.isBodyValid(UserValidator.forgotPasswordSet),
+  authMiddleware.checkActionToken(ActionTokenTypeEnum.FORGOT_PASSWORD),
+  authController.forgotPasswordSet,
+);
+
+router.post(
+  "/verify",
+  authMiddleware.checkActionToken(ActionTokenTypeEnum.VERIFY_EMAIL),
+  authController.verify,
 );
 
 // Експортуємо маршрутизатор для використання в інших частинах програми
