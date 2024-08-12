@@ -12,7 +12,6 @@ class EmailService {
   private transporter: Transporter;
 
   constructor() {
-    // Створення транспорту для Nodemailer з використанням Gmail
     this.transporter = nodemailer.createTransport({
       service: "gmail",
       from: configs.SMTP_EMAIL,
@@ -22,45 +21,35 @@ class EmailService {
       },
     });
 
-    // Налаштування використання шаблонів Handlebars для листів
     this.transporter.use(
       "compile",
       hbs({
         viewEngine: {
           extname: ".hbs",
-          partialsDir: path.join(process.cwd(), "src", "templates", "partials"), // Шлях до часткових шаблонів
-          layoutsDir: path.join(process.cwd(), "src", "templates", "layouts"), // Шлях до основних шаблонів
+          partialsDir: path.join(process.cwd(), "src", "templates", "partials"),
+          layoutsDir: path.join(process.cwd(), "src", "templates", "layouts"),
         },
-        viewPath: path.join(process.cwd(), "src", "templates", "views"), // Шлях до основного каталогу з шаблонами
+        viewPath: path.join(process.cwd(), "src", "templates", "views"),
         extName: ".hbs",
       }),
     );
   }
 
-  // Метод для відправки листів
   public async sendEmail<T extends EmailTypeEnum>(
     type: T,
     to: string,
     context: EmailTypeToPayloadType[T],
   ): Promise<void> {
-    // Отримання теми та шаблону для певного типу листа
     const { subject, template } = emailConstant[type];
 
-    // Додавання URL фронтенду до контексту шаблону
-    context["frontUrl"] = configs.FRONTEND_URL;
-
-    // Налаштування опцій для листа
     const options = {
       to,
       subject,
       template,
       context,
     };
-
-    // Відправка листа
     await this.transporter.sendMail(options);
   }
 }
 
-// Експортуємо екземпляр EmailService
 export const emailService = new EmailService();

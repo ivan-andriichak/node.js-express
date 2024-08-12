@@ -72,5 +72,12 @@ router.post(
   authController.verify,
 );
 
+router.post(
+  "/change-password",
+  authMiddleware.checkAccessToken,
+  commonMiddleware.isBodyValid(UserValidator.changePassword),
+  authController.changePassword,
+);
+
 // Експортуємо маршрутизатор для використання в інших частинах програми
 export const authRouter = router;

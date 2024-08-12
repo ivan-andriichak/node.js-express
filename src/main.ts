@@ -2,6 +2,7 @@ import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 
 import { configs } from "./configs/configs";
+import { jobRunner } from "./crons";
 import { ApiError } from "./errors/api-errors";
 import { authRouter } from "./routers/auth.router";
 import { userRouter } from "./routers/user.router";
@@ -37,4 +38,5 @@ process.on("uncaughtException", (e) => {
 app.listen(configs.APP_PORT, configs.APP_HOST, async () => {
   await mongoose.connect(configs.MONGO_URL, {}); // Підключається до MongoDB
   console.log(`Server is running on port ${configs.APP_PORT}`); // Виводить повідомлення про успішний запуск сервера
+  jobRunner();
 });

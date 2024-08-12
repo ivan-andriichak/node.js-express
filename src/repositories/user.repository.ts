@@ -1,4 +1,5 @@
 import { IUser } from "../interfaces/user.inerface";
+import { Token } from "../models/token.model";
 import { User } from "../models/user.model";
 
 class UserRepository {
@@ -23,9 +24,12 @@ class UserRepository {
   }
 
   // Метод для отримання користувача за ID
-  public async getById(userId: string): Promise<IUser> {
+  public async getById(
+    userId: string,
+    populate: string[] = [],
+  ): Promise<IUser> {
     // Використовує метод findById з моделі User для пошуку користувача за його ID
-    return await User.findById(userId);
+    return await User.findById(userId).populate(populate);
   }
 
   // Метод для оновлення користувача за ID
@@ -35,6 +39,32 @@ class UserRepository {
     return await User.findByIdAndUpdate(userId, dto, {
       returnDocument: "after",
     });
+  }
+
+  public async findWithOutActivityAfter(date: Date): Promise<IUser[]> {
+    return await User.aggregate([
+      {
+        $lookup: {
+          from: Token.collection.name,
+          let: { userId: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$_userId", "$$userId"] } } },
+            { $match: { createdAt: { $gt: date } } },
+          ],
+          as: "tokens",
+        },
+      },
+      {
+        $match: { tokens: { $size: 0 } },
+      },
+      // {
+      //   $project: {
+      //     _id: 1,
+      //     email: 1,
+      //     name: 1,
+      //   },
+      // },
+    ]);
   }
 
   // Метод для видалення користувача за ID
