@@ -1,8 +1,10 @@
 import { Router } from "express";
 
+import { avatarConfig } from "../constants/image.constant";
 import { userController } from "../controllers/user.controller";
 import { authMiddleware } from "../middlewares/auth.middleware";
 import { commonMiddleware } from "../middlewares/common.middleware";
+import { fileMiddleware } from "../middlewares/file.middleware";
 import { UserValidator } from "../validator/user.validator";
 
 // Створюємо новий екземпляр роутера
@@ -24,6 +26,19 @@ router.put(
 
 // Визначення маршруту для видалення поточного користувача
 router.delete("/:me", authMiddleware.checkAccessToken, userController.deleteMe);
+
+router.post(
+  "/me/avatar",
+  authMiddleware.checkAccessToken,
+  fileMiddleware.isFileValid("avatar", avatarConfig),
+  userController.uploadAvatar,
+);
+
+router.delete(
+  "/me/avatar",
+  authMiddleware.checkAccessToken,
+  userController.deleteAvatar,
+);
 
 // Визначення маршруту для отримання інформації про користувача за ID
 router.get(

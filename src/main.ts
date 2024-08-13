@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
+import fileUpload from "express-fileupload";
 import mongoose from "mongoose";
 
 import { configs } from "./configs/configs";
@@ -15,6 +16,8 @@ app.use(express.json());
 
 // Налаштовуємо парсер для обробки URL-закодованих запитів
 app.use(express.urlencoded({ extended: true }));
+
+app.use(fileUpload());
 
 // Встановлюємо роутери для обробки запитів на '/auth' та '/users'
 app.use("/auth", authRouter); // Роутер для обробки запитів авторизації
