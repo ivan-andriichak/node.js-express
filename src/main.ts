@@ -1,7 +1,10 @@
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
 import fileUpload from "express-fileupload";
 import mongoose from "mongoose";
+import swaggerUi from "swagger-ui-express";
 
+import swaggerSpec from "../docs/swagger.json";
 import { configs } from "./configs/configs";
 import { jobRunner } from "./crons";
 import { ApiError } from "./errors/api-errors";
@@ -10,6 +13,20 @@ import { userRouter } from "./routers/user.router";
 
 // Створюємо додаток express
 const app = express();
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    allowedHeaders: [
+      "Authorization",
+      "Content-Type",
+      "Origin",
+      "Access-Control-Allow-Origin",
+    ],
+    preflightContinue: false,
+    optionsSuccessStatus: 200,
+  }),
+);
 
 // Налаштовуємо парсер для обробки JSON-запитів
 app.use(express.json());
@@ -20,8 +37,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 
 // Встановлюємо роутери для обробки запитів на '/auth' та '/users'
+
+// app.use(rateLimit({ windowMs: 60 * 1000, limit: 5 }));
 app.use("/auth", authRouter); // Роутер для обробки запитів авторизації
 app.use("/users", userRouter); // Роутер для обробки запитів користувачів
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Обробник помилок для всіх маршрутів
 app.use(

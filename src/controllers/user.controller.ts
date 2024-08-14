@@ -1,15 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import { UploadedFile } from "express-fileupload";
 
-import { IUser } from "../interfaces/user.inerface";
+import { IUser, IUserListQuery } from "../interfaces/user.inerface";
 import { UserPresenter } from "../presenters/user.presenter";
 import { userService } from "../services/user.service";
 
 class UserController {
   public async getList(req: Request, res: Response, next: NextFunction) {
     try {
-      const query = req.query;
+      const query = req.query as IUserListQuery;
       // Виклик сервісу для отримання списку користувачів
+      console.log(query);
       const result = await userService.getList(query);
       // Відправлення результату у форматі JSON
       res.json(result);

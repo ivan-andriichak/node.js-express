@@ -1,4 +1,5 @@
 import { Router } from "express";
+import rateLimit from "express-rate-limit";
 
 import { avatarConfig } from "../constants/image.constant";
 import { userController } from "../controllers/user.controller";
@@ -11,10 +12,20 @@ import { UserValidator } from "../validator/user.validator";
 const router = Router();
 
 // Визначення маршруту для отримання списку користувачів
-router.get("/", userController.getList);
+router.get(
+  "/",
+  rateLimit({ windowMs: 60 * 1000, limit: 5 }),
+  commonMiddleware.isQueryValid(UserValidator.listQuery),
+  userController.getList,
+);
 
 // Визначення маршруту для отримання інформації про поточного користувача
-router.get("/:me", authMiddleware.checkAccessToken, userController.getMe);
+router.get(
+  "/me",
+  rateLimit({ windowMs: 60 * 1000, limit: 5 }),
+  authMiddleware.checkAccessToken,
+  userController.getMe,
+);
 
 // Визначення маршруту для оновлення інформації про поточного користувача
 router.put(
